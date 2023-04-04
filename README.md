@@ -46,6 +46,7 @@ CLIENTS
 - Create, Read, Update, Delete Clients
 
 USERS
+- FIREBASE API FOR USER LOGIN/DATA MAANGEMENT
 - Create, Read, Update, Delete Users
 - Maintain role management with activity permissions
 - Display last log on / Created on
