@@ -5,6 +5,9 @@ Inventory Manager Capstone Project
 - This React/Django web app is an admin dashboard where a company can manage inventory of materials/goods for sale to third-party businesses.
 
 #functionalities
+SIGNIN
+- FIREBASE API FOR USER LOGIN/DATA MANAGEMENT
+
 NAVIGATION
 - Dashboard
 - Full Inventory List
@@ -37,16 +40,15 @@ QUOTES
 - Allow clients to accept a quote, which automatically creates an invoice and decrements items
 
 INVOICING
-- STRIPE API INTEGRATION FOR INVOICES
 - Create, Read, Update, Delete Invoices
 - Issue inventory to clients, creating an invoice object and decrementing items
 - Display paid status
+- FEDEX API FOR GENERATING SHIPPING LABELS
 
 CLIENTS
 - Create, Read, Update, Delete Clients
 
 USERS
-- FIREBASE API FOR USER LOGIN/DATA MAANGEMENT
 - Create, Read, Update, Delete Users
 - Maintain role management with activity permissions
 - Display last log on / Created on
@@ -57,4 +59,3 @@ USER ACTIVITY LOG
 #stretch
 - Implement Typescript for this project as a stretch goal
 - Pagination for each list display (Items, Categories, Users, Clients)
-- Implement payment processing through STRIPE API
