@@ -6,7 +6,7 @@ Inventory Manager Capstone Project
 
 #functionalities
 SIGNIN
-- FIREBASE API FOR USER LOGIN/DATA MAANGEMENT
+- FIREBASE API FOR USER LOGIN/DATA MANAGEMENT
 
 NAVIGATION
 - Dashboard
@@ -37,14 +37,12 @@ INVOICING
 - Create, Read, Update, Delete Invoices
 - Issue inventory to clients, creating an invoice object and decrementing items
 - Display paid status
-- Display Shipped Status
-- Button to generate FEDEX Shipping Label
+- FEDEX API FOR GENERATING SHIPPING LABELS
 
 CLIENTS
 - Create, Read, Update, Delete Clients
 
 USERS
-
 - Create, Read, Update, Delete Users
 - Maintain role management with activity permissions
 - Display last log on / Created on
@@ -55,4 +53,3 @@ USER ACTIVITY LOG
 #stretch
 - Implement Typescript for this project as a stretch goal
 - Pagination for each list display (Items, Categories, Users, Clients)
-- Implement payment processing through STRIPE API
