@@ -3,7 +3,7 @@ from user_control.models import CustomUser
 from user_control.views import add_user_activity
 
 class InventoryGroup(models.Model):
-    created_by = models.ForeginKey(
+    created_by = models.ForeignKey(
         CustomUser, null=True, related_name="inventory_groups", 
         on_delete=models.SET_NULL
     )
@@ -15,7 +15,7 @@ class InventoryGroup(models.Model):
     created_by = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ("-created_at")
+        ordering = ("-created_at", )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -25,7 +25,7 @@ class InventoryGroup(models.Model):
         action = f"added new group - '{self.name}'"
         if self.pk is not None:
             action = f"updated group from - '{self.old_name}' to '{self.name}'"
-        super().save(*args. **kwargs) 
+        super().save(*args, **kwargs) 
         add_user_activity(self.created_by, action = action)
 
     def delete(self, *args, **kwargs):
@@ -39,8 +39,8 @@ class InventoryGroup(models.Model):
     
 
 class Inventory(models.Model):
-    created_by = models.ForeginKey(
-        CustomUser, null=True, related_name="inventory_groups", 
+    created_by = models.ForeignKey(
+        CustomUser, null=True, related_name="inventory_items", 
         on_delete=models.SET_NULL
     )
     code = models.CharField(max_length=10, unique=True, null=True)
@@ -54,7 +54,7 @@ class Inventory(models.Model):
     created_by = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ("-created_at")
+        ordering = ("-created_at", )
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
