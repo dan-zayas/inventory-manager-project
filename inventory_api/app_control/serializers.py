@@ -29,6 +29,11 @@ class InventorySerializer(serializers.ModelSerializer):
         model = Inventory
         fields = "__all__"
 
+
+class InventoryWithSumSerializer(InventorySerializer):
+    sum_of_item = serializers.IntegerField()
+
+
 class ClientSerializer(serializers.ModelSerializer):
     created_by = CustomUserSerializer(read_only=True)
     created_by_id = serializers.CharField(write_only=True, required=False)
@@ -39,6 +44,9 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields = "__all__"
 
+class ClientWithAmountSerializer(ClientSerializer):
+    amount_total = serializers.FloatField()
+    month = serializers.CharField(required=False)
 
 class InvoiceItemSerializer(serializers.ModelSerializer):
     invoice = serializers.CharField(read_only=True)
