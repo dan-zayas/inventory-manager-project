@@ -1,0 +1,33 @@
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #18191A;
+    color: #e4e6eb;
+}
+
+a {
+    text-decoration: none;
+    color: #03a9f4;
+}
+
+.login {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .inner {
+        min-width: 400px;
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #242526;
+            margin-bottom: 20px;
+        }
+    }
+}
