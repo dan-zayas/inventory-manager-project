@@ -1,18 +1,15 @@
-import { Form, Input, Select, Button, notification } from "antd";
+import { Form, Input, Button, notification } from "antd";
 import Modal from "antd/lib/modal/Modal";
 import { FC, useState } from "react";
 import { axiosRequest } from "../utils/functions";
 import { DataProps, FormModalProps } from "../utils/types";
-import { CreateUserUrl } from "../utils/network";
+import { ClientUrl } from "../utils/network";
 
-const { Option } = Select;
-
-const AddUserForm: FC<FormModalProps> = ({
+const AddClientForm: FC<FormModalProps> = ({
   isVisible = false,
   onSuccessCallBack,
   onClose,
 }) => {
-  // Initialize form and state
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -20,71 +17,48 @@ const AddUserForm: FC<FormModalProps> = ({
   const onSubmit = async (values: DataProps) => {
     setLoading(true);
 
+    // API call to create a new shop
     const response = await axiosRequest({
       method: "post",
-      url: CreateUserUrl,
+      url: ClientUrl,
       hasAuth: true,
       payload: values,
     });
+
     setLoading(false);
 
+    // Notify user on successful shop creation
     if (response) {
       notification.success({
         message: "Operation Success",
-        description: "User created successfully",
+        description: "Client added successfully",
       });
       onSuccessCallBack();
       form.resetFields();
     }
   };
 
-  // Return the modal with the form for adding a new user
   return (
+    // Render the modal for adding a new shop
     <Modal
-      title="Add User"
+      title="Add Client"
       visible={isVisible}
       onCancel={onClose}
       footer={false}
     >
       <Form layout="vertical" onFinish={onSubmit} form={form}>
-        {/* Email input field */}
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[
-            { required: true, message: "Please input your email!" },
-          ]}
-        >
-          <Input placeholder="Email" type="email" />
-        </Form.Item>
-
-        {/* Name input field */}
         <Form.Item
           label="Name"
-          name="fullname"
+          name="name"
           rules={[
-            { required: true, message: "Please input your name!" },
+            {
+              required: true,
+              message: "Please enter a client name!",
+            },
           ]}
         >
           <Input placeholder="Name" type="text" />
         </Form.Item>
-
-        {/* Role select field */}
-        <Form.Item
-          label="Role"
-          name="role"
-          rules={[
-            { required: true, message: "Please select a role!" },
-          ]}
-        >
-          <Select placeholder="Role">
-            <Option value="admin">Admin</Option>
-            <Option value="creator">Creator</Option>
-            <Option value="sale">Sale</Option>
-          </Select>
-        </Form.Item>
-
-        {/* Submit button */}
         <Form.Item>
           <Button
             htmlType="submit"
@@ -100,4 +74,4 @@ const AddUserForm: FC<FormModalProps> = ({
   );
 };
 
-export default AddUserForm;
+export default AddClientForm;

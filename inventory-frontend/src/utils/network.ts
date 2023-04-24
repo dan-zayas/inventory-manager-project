@@ -11,11 +11,11 @@ export const ActivitiesUrl = BaseUrl + "user/activities-log"
 export const GroupUrl = BaseUrl + "app/group"
 export const InventoryUrl = BaseUrl + "app/inventory"
 export const InventoryCSVUrl = BaseUrl + "app/inventory-csv"
-export const ShopUrl = BaseUrl + "app/shop"
+export const ClientUrl = BaseUrl + "app/client"
 export const InvoiceUrl = BaseUrl + "app/invoice"
 export const SummaryUrl = BaseUrl + "app/summary"
 export const TopSellUrl = BaseUrl + "app/top-selling"
-export const ShopSaleUrl = BaseUrl + "app/sales-by-shop"
+export const ClientSaleUrl = BaseUrl + "app/sales-by-client"
 export const PurchaseSummaryUrl = BaseUrl + "app/purchase-summary"
 
 

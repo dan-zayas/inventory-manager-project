@@ -102,7 +102,7 @@ export interface InvoiceCreationProps {
     action?: React.ReactElement
 }
 
-export interface ShopProps {
+export interface ClientProps {
     created_at: string
     name: string
     created_by: DataProps 
@@ -115,5 +115,5 @@ export interface invoiceType {
     created_at: string
     created_by_email: string
     invoice_items: InvoiceCreationProps[]
-    shop_name: string
+    client_name: string
 }

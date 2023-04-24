@@ -1,4 +1,4 @@
-import {FC, useState} from 'react'
+import { FC, useState } from 'react'
 import { axiosRequest } from '../utils/functions';
 import { ActivitiesUrl } from '../utils/network';
 import { useEffect } from 'react';
@@ -13,57 +13,66 @@ interface UserActivitiesProps {
   id: number
 }
 
-const UserActivities:FC = () => {
+const UserActivities: FC = () => {
 
-    const [fetching, setFetching] = useState(true)
-    const [userActivities, setUserActivities] = useState<UserActivitiesProps[]>([])
-      
-    const columns = [
-      {
-        title: 'Action',
-        dataIndex: 'action',
-        key: 'action',
-      },
-      {
-        title: 'Performed By',
-        dataIndex: 'email',
-        key: 'email',
-      },
-      {
-        title: 'Created At',
-        dataIndex: 'created_at',
-        key: 'created_at',
-      },
-    ];
+  // Initialize states
+  const [fetching, setFetching] = useState(true)
+  const [userActivities, setUserActivities] = useState<UserActivitiesProps[]>([])
 
-    const getActivities = async () => {
-      const response = await axiosRequest<{results: UserActivitiesProps[]}>({
-        url: ActivitiesUrl,
-        hasAuth: true,
-        showError: false
-      })
+  // Define columns to be rendered in the table
+  const columns = [
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      key: 'action',
+    },
+    {
+      title: 'Performed By',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'created_at',
+      key: 'created_at',
+    },
+  ];
 
-      if(response){
-        const data = response.data.results
-        setUserActivities(data)
-        setFetching(false)
-      }
+  // Function to fetch activities from the backend API
+  const getActivities = async () => {
+    const response = await axiosRequest<{ results: UserActivitiesProps[] }>({
+      url: ActivitiesUrl,
+      hasAuth: true,
+      showError: false
+    })
+
+    if (response) {
+      const data = response.data.results
+      setUserActivities(data)
+      setFetching(false)
     }
+  }
 
-    useEffect(() => {
-      getActivities()
-    }, [])
+  // Fetch activities on mount
+  useEffect(() => {
+    getActivities()
+  }, [])
 
-    return (
-        <ContentLayout
-          pageTitle="User Activitie"
-          dataSource={(userActivities as unknown) as DataProps[]}
-          columns={columns}
-          fetching={fetching}
-          disableAddButton
-        />
-    )
+  // Render the component
+  return (
+    <ContentLayout
+      // Set the page title
+      pageTitle="User Activity"
+      // Set the data source for the table
+      dataSource={(userActivities as unknown) as DataProps[]}
+      // Set the columns to be rendered in the table
+      columns={columns}
+      // Set the fetching state of the component
+      fetching={fetching}
+      // Disable the "Add" button in the layout
+      disableAddButton
+    />
+  )
 }
-
 
 export default UserActivities

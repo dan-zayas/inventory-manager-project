@@ -1,10 +1,10 @@
 import { notification } from "antd"
 import Axios, {AxiosResponse} from "axios"
 import { tokenName } from "./data"
-import { GroupUrl, InventoryUrl, InvoiceUrl, MeUrl, ShopUrl } from "./network"
-import { AuthTokenType, CustomAxiosError, DataProps, GroupProps, InventoryProps, InvoiceCreationProps, invoiceType, ShopProps, UserType } from "./types"
+import { GroupUrl, InventoryUrl, InvoiceUrl, MeUrl, ClientUrl } from "./network"
+import { AuthTokenType, CustomAxiosError, DataProps, GroupProps, InventoryProps, InvoiceCreationProps, invoiceType, ClientProps, UserType } from "./types"
 
-
+// Get the authorization token from local storage
 export const getAuthToken = ():AuthTokenType | null => {
     const accessToken = localStorage.getItem(tokenName)
     if (!accessToken){
@@ -14,12 +14,13 @@ export const getAuthToken = ():AuthTokenType | null => {
     return {Authorization: `Bearer ${accessToken}`}
 }
 
+// Remove the authorization token from local storage and redirect to the login page
 export const logout = () => {
     localStorage.removeItem(tokenName)
     window.location.href = "/login"
 }
 
-
+// Get the current user's details from the server
 export const authHandler = async ():Promise<UserType | null> => {
     const response = await axiosRequest<UserType>(
         {url: MeUrl, hasAuth: true, showError:false})
@@ -31,6 +32,7 @@ export const authHandler = async ():Promise<UserType | null> => {
     return null
 }
 
+// Send an Axios request with optional authorization and error handling
 interface AxiosRequestProps {
     method?: 'get' | 'post' | 'patch' | 'delete',
     url: string,
@@ -42,7 +44,6 @@ interface AxiosRequestProps {
         description?: string
     }
 }
-
 export const axiosRequest = async <T>({
     method = 'get',
     url,
@@ -78,6 +79,7 @@ export const axiosRequest = async <T>({
     return null
 }
 
+// Get all the groups from the server
 export const getGroups = async (
     setGroup: (data: GroupProps[]) => void, 
     setFetching: (val:boolean) => void
@@ -98,6 +100,7 @@ export const getGroups = async (
     }
   }
 
+// Get all the inventories from the server
   export const getInventories = async (
     setGroup: (data: InventoryProps[]) => void, 
     setFetching: (val:boolean) => void
@@ -118,12 +121,12 @@ export const getGroups = async (
     }
   }
 
-  export const getShops = async (
-    setShop: (data: ShopProps[]) => void, 
+  export const getClients = async (
+    setClient: (data: ClientProps[]) => void, 
     setFetching: (val:boolean) => void
 ) => {
-    const response = await axiosRequest<{results:ShopProps[]}>({
-      url: ShopUrl,
+    const response = await axiosRequest<{results:ClientProps[]}>({
+      url: ClientUrl,
       hasAuth: true,
       showError: false
     })
@@ -132,7 +135,7 @@ export const getGroups = async (
         const data = response.data.results.map(
             (item: any) => 
             ({...item, created_by_email: (item.created_by.email as string)}))
-        setShop(data)
+        setClient(data)
       setFetching(false)
     }
   }
@@ -158,7 +161,7 @@ export const getGroups = async (
       const data: invoiceType[] = response.data.results.map((item: any) => ({
         ...item,
         created_by_email: item.created_by.email,
-        shop_name: item.shop.name,
+        client_name: item.client.name,
         invoice_items: item.invoice_items.map((i: any) => ({
           id: i.id,
           price: i.amount,
