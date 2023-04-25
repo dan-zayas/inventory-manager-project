@@ -10,7 +10,7 @@ import {
 import { axiosRequest } from "../utils/functions";
 import { DataProps, FormModalProps, GroupProps } from "../utils/types";
 import { CloudinaryUrl, InventoryUrl } from "../utils/network";
-import ImageHolder from "../assets/imageHolder.png";
+import ImageHolder from "../assets/ImageHolder.png";
 
 const { Option } = Select;
 

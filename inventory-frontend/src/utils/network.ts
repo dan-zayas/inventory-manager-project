@@ -19,4 +19,4 @@ export const ClientSaleUrl = BaseUrl + "app/sales-by-client"
 export const PurchaseSummaryUrl = BaseUrl + "app/purchase-summary"
 
 
-export const CloudinaryUrl = "https://api.cloudinary.com/v1_1/adefemigreat/upload"
+export const CloudinaryUrl = "#"
