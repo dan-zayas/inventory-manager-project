@@ -51,7 +51,7 @@ const AddGroupForm: FC<AddGroupFormProps> = ({
   return (
     <Modal
       title="Add Group"
-      visible={isVisible}
+      open={isVisible}
       onCancel={onClose}
       footer={false}
       maskClosable={false}

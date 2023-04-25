@@ -1,12 +1,14 @@
+from django.db import models
 from .models import Inventory, InventoryGroup, Client, Invoice, InvoiceItem
 from user_control.serializers import CustomUserSerializer
 from rest_framework import serializers
+
 
 class InventoryGroupSerializer(serializers.ModelSerializer):
     created_by = CustomUserSerializer(read_only=True)
     created_by_id = serializers.CharField(write_only=True, required=False)
     belongs_to = serializers.SerializerMethodField(read_only=True)
-    belongs_to_id = serializers.CharField(write_only=True)
+    belongs_to_id = serializers.CharField(write_only=True, required=False)
     total_items = serializers.CharField(read_only=True, required=False)
 
     class Meta:
@@ -17,7 +19,7 @@ class InventoryGroupSerializer(serializers.ModelSerializer):
         if obj.belongs_to is not None:
             return InventoryGroupSerializer(obj.belongs_to).data
         return None
-    
+
 
 class InventorySerializer(serializers.ModelSerializer):
     created_by = CustomUserSerializer(read_only=True)
@@ -33,7 +35,7 @@ class InventorySerializer(serializers.ModelSerializer):
 class InventoryWithSumSerializer(InventorySerializer):
     sum_of_item = serializers.IntegerField()
 
-
+    
 class ClientSerializer(serializers.ModelSerializer):
     created_by = CustomUserSerializer(read_only=True)
     created_by_id = serializers.CharField(write_only=True, required=False)
@@ -44,11 +46,13 @@ class ClientSerializer(serializers.ModelSerializer):
         model = Client
         fields = "__all__"
 
+
 class ClientWithAmountSerializer(ClientSerializer):
     amount_total = serializers.FloatField()
     month = serializers.CharField(required=False)
 
-class InvoiceItemSerializer(serializers.ModelSerializer):
+
+class InvoiceItemSeriliazer(serializers.ModelSerializer):
     invoice = serializers.CharField(read_only=True)
     invoice_id = serializers.CharField(write_only=True)
     item = InventorySerializer(read_only=True)
@@ -69,7 +73,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     created_by_id = serializers.CharField(write_only=True, required=False)
     client = ClientSerializer(read_only=True)
     client_id = serializers.CharField(write_only=True)
-    invoice_items = InvoiceItemSerializer(read_only=True, many=True)
+    invoice_items = InvoiceItemSeriliazer(read_only=True, many=True)
     invoice_item_data = InvoiceItemDataSerializer(write_only=True, many=True)
 
     class Meta:
@@ -81,10 +85,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
 
         if not invoice_item_data:
             raise Exception("You need to provide at least one invoice item")
-        
+
         invoice = super().create(validated_data)
 
-        invoice_item_serializer = InvoiceItemSerializer(data=[
+        invoice_item_serializer = InvoiceItemSeriliazer(data=[
             {"invoice_id": invoice.id, **item} for item in invoice_item_data
         ], many=True)
 
@@ -93,5 +97,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
         else:
             invoice.delete()
             raise Exception(invoice_item_serializer.errors)
-        
+
         return invoice
+
+        

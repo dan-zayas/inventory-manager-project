@@ -42,7 +42,7 @@ const AddClientForm: FC<FormModalProps> = ({
     // Render the modal for adding a new shop
     <Modal
       title="Add Client"
-      visible={isVisible}
+      open={isVisible}
       onCancel={onClose}
       footer={false}
     >

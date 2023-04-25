@@ -58,7 +58,7 @@ const AddInventoryFormCSV:FC<FormModalProps> =  ({
     return (
         <Modal 
             title="Add Inventory Items (CSV)" 
-            visible={isVisible} 
+            open={isVisible} 
             onCancel={onClose}
             footer={false}
             maskClosable={false}

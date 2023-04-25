@@ -1,6 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializers import (
-    Inventory, InventorySerializer, InventoryGroup, InventoryGroupSerializer, Client, ClientSerializer, Invoice, InvoiceSerializer, InventoryWithSumSerializer, ClientWithAmountSerializer, InvoiceItem
+    Inventory, InventorySerializer, InventoryGroupSerializer, InventoryGroup,
+    Client, ClientSerializer, Invoice, InvoiceSerializer, InventoryWithSumSerializer,
+    ClientWithAmountSerializer, InvoiceItem
 )
 from rest_framework.response import Response
 from inventory_api.custom_methods import IsAuthenticatedCustom
@@ -13,53 +15,55 @@ import csv
 import codecs
 
 
+
 class InventoryView(ModelViewSet):
     queryset = Inventory.objects.select_related("group", "created_by")
     serializer_class = InventorySerializer
-    permission_classes = (IsAuthenticatedCustom, )
+    permission_classes = (IsAuthenticatedCustom,)
     pagination_class = CustomPagination
 
     def get_queryset(self):
         if self.request.method.lower() != "get":
             return self.queryset
-        
+
         data = self.request.query_params.dict()
-        data.pop("page")
+        data.pop("page", None)
         keyword = data.pop("keyword", None)
 
-        results = self.queryset(**data)
+        results = self.queryset.filter(**data)
 
         if keyword:
             search_fields = (
-                "code", "created_by__fullname", "created_by__email", "group__name", "name"
+                "code", "created_by__fullname", "created_by__email", 
+                "group__name", "name"
             )
             query = get_query(keyword, search_fields)
-            results = results.filter(query)
+            return results.filter(query)
         
         return results
 
-    
+
     def create(self, request, *args, **kwargs):
-        request.data.update({"created_by_id": request.user.id})
+        request.data.update({"created_by_id":request.user.id})
         return super().create(request, *args, **kwargs)
-    
+
 
 class InventoryGroupView(ModelViewSet):
     queryset = InventoryGroup.objects.select_related(
         "belongs_to", "created_by").prefetch_related("inventories")
     serializer_class = InventoryGroupSerializer
-    permission_classes = (IsAuthenticatedCustom, )
+    permission_classes = (IsAuthenticatedCustom,)
     pagination_class = CustomPagination
 
     def get_queryset(self):
         if self.request.method.lower() != "get":
             return self.queryset
-        
+
         data = self.request.query_params.dict()
-        data.pop("page")
+        data.pop("page", None)
         keyword = data.pop("keyword", None)
 
-        results = self.queryset(**data)
+        results = self.queryset.filter(**data)
 
         if keyword:
             search_fields = (
@@ -74,26 +78,26 @@ class InventoryGroupView(ModelViewSet):
             total_items = Count('inventories')
         )
 
-    
     def create(self, request, *args, **kwargs):
-        request.data.update({"created_by_id": request.user.id})
+        request.data.update({"created_by_id":request.user.id})
         return super().create(request, *args, **kwargs)
+
 
 class ClientView(ModelViewSet):
     queryset = Client.objects.select_related("created_by")
     serializer_class = ClientSerializer
-    permission_classes = (IsAuthenticatedCustom, )
+    permission_classes = (IsAuthenticatedCustom,)
     pagination_class = CustomPagination
 
     def get_queryset(self):
         if self.request.method.lower() != "get":
             return self.queryset
-        
+
         data = self.request.query_params.dict()
-        data.pop("page")
+        data.pop("page", None)
         keyword = data.pop("keyword", None)
 
-        results = self.queryset(**data)
+        results = self.queryset.filter(**data)
 
         if keyword:
             search_fields = (
@@ -104,28 +108,27 @@ class ClientView(ModelViewSet):
         
         return results
 
-    
     def create(self, request, *args, **kwargs):
-        request.data.update({"created_by_id": request.user.id})
+        request.data.update({"created_by_id":request.user.id})
         return super().create(request, *args, **kwargs)
-    
+
 
 class InvoiceView(ModelViewSet):
     queryset = Invoice.objects.select_related(
         "created_by", "client").prefetch_related("invoice_items")
     serializer_class = InvoiceSerializer
-    permission_classes = (IsAuthenticatedCustom, )
+    permission_classes = (IsAuthenticatedCustom,)
     pagination_class = CustomPagination
 
     def get_queryset(self):
         if self.request.method.lower() != "get":
             return self.queryset
-        
+
         data = self.request.query_params.dict()
-        data.pop("page")
+        data.pop("page", None)
         keyword = data.pop("keyword", None)
 
-        results = self.queryset(**data)
+        results = self.queryset.filter(**data)
 
         if keyword:
             search_fields = (
@@ -136,20 +139,19 @@ class InvoiceView(ModelViewSet):
         
         return results
 
-    
     def create(self, request, *args, **kwargs):
-        request.data.update({"created_by_id": request.user.id})
+        request.data.update({"created_by_id":request.user.id})
         return super().create(request, *args, **kwargs)
-    
 
-class SummmaryView(ModelViewSet):
+
+class SummaryView(ModelViewSet):
     http_method_names = ('get',)
     permission_classes = (IsAuthenticatedCustom,)
     queryset = InventoryView.queryset
 
-    def list(self,request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         total_inventory = InventoryView.queryset.filter(
-            remaining_gt=0
+            remaining__gt=0
         ).count()
         total_group = InventoryGroupView.queryset.count()
         total_client = ClientView.queryset.count()
@@ -162,13 +164,14 @@ class SummmaryView(ModelViewSet):
             "total_users": total_users
         })
 
+
 class SalePerformanceView(ModelViewSet):
     http_method_names = ('get',)
     permission_classes = (IsAuthenticatedCustom,)
     queryset = InventoryView.queryset
 
     def list(self, request, *args, **kwargs):
-        query_data = request.query_params.dict()
+        query_data = request.query_params.dict() 
         total = query_data.get('total', None)
         query = self.queryset
 
@@ -182,10 +185,10 @@ class SalePerformanceView(ModelViewSet):
                 )
 
         items = query.annotate(
-            sum_of_item = Coalesce(
+            sum_of_item=Coalesce(
                 Sum("inventory_invoices__quantity"), 0
             )
-        ).order('-sum_of_item')[0:10]
+        ).order_by('-sum_of_item')[0:10]
 
         response_data = InventoryWithSumSerializer(items, many=True).data
         return Response(response_data)
@@ -197,7 +200,7 @@ class SaleByClientView(ModelViewSet):
     queryset = InventoryView.queryset
 
     def list(self, request, *args, **kwargs):
-        query_data = request.query_params.dict()
+        query_data = request.query_params.dict() 
         total = query_data.get('total', None)
         monthly = query_data.get('monthly', None)
         query = ClientView.queryset
@@ -214,17 +217,19 @@ class SaleByClientView(ModelViewSet):
         if monthly:
             clients = query.annotate(month=TruncMonth('created_at')).values(
                 'month', 'name').annotate(amount_total=Sum(
-                    F("sale_client__invoice_items__quantity") * F("sale_client__invoice_items__amount")
+                    F("sale_client__invoice_items__quantity") * 
+                    F("sale_client__invoice_items__amount")
                 ))
 
         else:
             clients = query.annotate(amount_total=Sum(
-                    F("sale_client__invoice_items__quantity") * F("sale_client__invoice_items__amount")
+                    F("sale_client__invoice_items__quantity") * 
+                    F("sale_client__invoice_items__amount")
                 )).order_by("-amount_total")
-            
+
         response_data = ClientWithAmountSerializer(clients, many=True).data
         return Response(response_data)
-    
+
 
 class PurchaseView(ModelViewSet):
     http_method_names = ('get',)
@@ -232,7 +237,7 @@ class PurchaseView(ModelViewSet):
     queryset = InvoiceView.queryset
 
     def list(self, request, *args, **kwargs):
-        query_data = request.query_params.dict()
+        query_data = request.query_params.dict() 
         total = query_data.get('total', None)
         query = InvoiceItem.objects.select_related("invoice", "item")
 
@@ -247,13 +252,13 @@ class PurchaseView(ModelViewSet):
 
         query = query.aggregate(
             amount_total=Sum(F('amount') * F('quantity')), total=Sum('quantity')
-        )
+            )
 
         return Response({
             "price": "0.00" if not query.get("amount_total") else query.get("amount_total"),
             "count": 0 if not query.get("total") else query.get("total"),
         })
-    
+
 
 class InventoryCSVLoaderView(ModelViewSet):
     http_method_names = ('post',)
@@ -265,8 +270,8 @@ class InventoryCSVLoaderView(ModelViewSet):
         try:
             data = request.FILES['data']
         except Exception as e:
-            raise Exception("You need to provide inventory CSV data")
-        
+            raise Exception("You need to provide inventory CSV 'data'")
+
         inventory_items = []
 
         try:
@@ -281,15 +286,15 @@ class InventoryCSVLoaderView(ModelViewSet):
                         "name": row[2],
                         "price": row[3],
                         "photo": row[4],
-                        "added_by_id": request.user.id
+                        "created_by_id": request.user.id
                     }
                 )
         except csv.Error as e:
             raise Exception(e)
-        
+
         if not inventory_items:
             raise Exception("CSV file cannot be empty")
-        
+
         data_validation = self.serializer_class(data=inventory_items, many=True)
         data_validation.is_valid(raise_exception=True)
         data_validation.save()

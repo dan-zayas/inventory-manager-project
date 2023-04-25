@@ -86,7 +86,7 @@ const AddInventoryForm: FC<AddInventoryFormProps> = ({
   return (
     <Modal
       title="Add Inventory Item"
-      visible={isVisible}
+      open={isVisible}
       onCancel={onClose}
       footer={false}
       maskClosable={false}

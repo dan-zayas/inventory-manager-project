@@ -1,6 +1,5 @@
 import { FC, ReactNode, useEffect, useState } from "react";
-import Logo from "../assets/logo.svg";
-import User from "../assets/user.svg";
+import { Logo, User } from "../assets/svgs/svgs";
 import { logout } from "../utils/functions";
 import { Link, useLocation } from "react-router-dom";
 
@@ -37,12 +36,12 @@ const Layout: FC<LayoutProps> = ({ children }) => {
     <div className="layout">
       <div className="header">
         <div className="brand">
-          <img src={Logo} alt="logo" />
+          <Logo />
         </div>
         <div className="rightNav">
           <div className="userAvatar">
-            <img src={User} alt="user" />
-            <div className="text">Adefemigreat</div>
+            <User />
+            <div className="text">Danozaur</div>
           </div>
           <div className="rightItem">
             <Link to="/invoice-section">

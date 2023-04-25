@@ -42,7 +42,7 @@ const AddUserForm: FC<FormModalProps> = ({
   return (
     <Modal
       title="Add User"
-      visible={isVisible}
+      open={isVisible}
       onCancel={onClose}
       footer={false}
     >

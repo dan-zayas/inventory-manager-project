@@ -65,7 +65,7 @@ export type ActionProps = {
 // Represents the shape of the context object for the store provider
 export interface StoreProviderProps {
     state: StoreProps,
-    dispatch: (arg: ActionProps) => void
+    dispatch: (arg?: ActionProps) => void
 }
 
 // Represents the props for a form modal component
