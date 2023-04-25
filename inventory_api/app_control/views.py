@@ -1,19 +1,20 @@
-from rest_framework.viewsets import ModelViewSet
-from .serializers import (
-    Inventory, InventorySerializer, InventoryGroupSerializer, InventoryGroup,
-    Client, ClientSerializer, Invoice, InvoiceSerializer, InventoryWithSumSerializer,
-    ClientWithAmountSerializer, InvoiceItem
-)
-from rest_framework.response import Response
-from inventory_api.custom_methods import IsAuthenticatedCustom
-from inventory_api.utils import CustomPagination, get_query
 from django.db.models import Count, Sum, F
 from django.db.models.functions import Coalesce, TruncMonth
-from user_control.views import add_user_activity
-from user_control.models import CustomUser
-import csv
 import codecs
-
+import csv
+from rest_framework import status
+from rest_framework.filters import OrderingFilter
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from inventory_api.custom_methods import IsAuthenticatedCustom
+from inventory_api.utils import CustomPagination, get_query
+from .serializers import (
+    Client, ClientSerializer, ClientWithAmountSerializer, Inventory,
+    InventorySerializer, InventoryGroup, InventoryGroupSerializer,
+    InventoryWithSumSerializer, Invoice, InvoiceItem, InvoiceSerializer,
+)
+from user_control.models import CustomUser
+from user_control.views import add_user_activity
 
 
 class InventoryView(ModelViewSet):
@@ -38,14 +39,16 @@ class InventoryView(ModelViewSet):
                 "group__name", "name"
             )
             query = get_query(keyword, search_fields)
-            return results.filter(query)
+            results = results.filter(query)
         
         return results
 
 
     def create(self, request, *args, **kwargs):
-        request.data.update({"created_by_id":request.user.id})
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(created_by=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class InventoryGroupView(ModelViewSet):
@@ -72,22 +75,22 @@ class InventoryGroupView(ModelViewSet):
             query = get_query(keyword, search_fields)
             results = results.filter(query)
 
-        
-        
-        return results.annotate(
-            total_items = Count('inventories')
-        )
+        return results.annotate(total_items=Count('inventories'))
 
     def create(self, request, *args, **kwargs):
-        request.data.update({"created_by_id":request.user.id})
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(created_by=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ClientView(ModelViewSet):
-    queryset = Client.objects.select_related("created_by")
+    queryset = Client.objects.prefetch_related("created_by").order_by("-created_at")
     serializer_class = ClientSerializer
     permission_classes = (IsAuthenticatedCustom,)
     pagination_class = CustomPagination
+    filter_backends = [OrderingFilter]
+    ordering_fields = ["name", "created_at"]
 
     def get_queryset(self):
         if self.request.method.lower() != "get":
@@ -105,12 +108,14 @@ class ClientView(ModelViewSet):
             )
             query = get_query(keyword, search_fields)
             results = results.filter(query)
-        
+
         return results
 
     def create(self, request, *args, **kwargs):
-        request.data.update({"created_by_id":request.user.id})
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(created_by=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class InvoiceView(ModelViewSet):
@@ -219,13 +224,13 @@ class SaleByClientView(ModelViewSet):
                 'month', 'name').annotate(amount_total=Sum(
                     F("sale_client__invoice_items__quantity") * 
                     F("sale_client__invoice_items__amount")
-                ))
+                )).prefetch_related(None)
 
         else:
             clients = query.annotate(amount_total=Sum(
                     F("sale_client__invoice_items__quantity") * 
                     F("sale_client__invoice_items__amount")
-                )).order_by("-amount_total")
+                )).order_by("-amount_total").prefetch_related(None)
 
         response_data = ClientWithAmountSerializer(clients, many=True).data
         return Response(response_data)
