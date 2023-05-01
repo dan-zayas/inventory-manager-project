@@ -1,8 +1,51 @@
-import {FC} from "react"
-import AuthComponent from "../components/AuthComponent"
+import { FC, useState } from 'react';
+import AuthComponent from '../components/AuthComponent';
+import { DataProps } from '../utils/types';
+import { tokenName } from '../utils/data';
+import { LoginUrl } from '../utils/network';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../utils/hooks';
+import { axiosRequest } from '../utils/functions';
 
-const Login:FC = () => {
-    return <AuthComponent />
+interface LoginDataProps {
+  access: string;
 }
 
-export default Login
+const Login: FC = () => {
+  // Declare state for loading state
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Redirect to homepage if the user is already authenticated
+  useAuth({
+    successCallBack: () => {
+      navigate('/');
+    },
+  });
+
+  // Handle the form submission to login the user
+  const onSubmit = async (values: DataProps) => {
+    setLoading(true);
+    // Send a request to the login endpoint with user credentials
+    const response = await axiosRequest<LoginDataProps>({
+      method: 'post',
+      url: LoginUrl,
+      payload: values,
+      errorObject: {
+        message: 'Login Error',
+      },
+    });
+
+    // If login is successful, store the access token in local storage and navigate to the homepage
+    if (response) {
+      localStorage.setItem(tokenName, response.data.access);
+      navigate('/');
+    }
+    setLoading(false);
+  };
+
+  // Render the AuthComponent with the onSubmit handler and loading state
+  return <AuthComponent onSubmit={onSubmit} loading={loading} />;
+};
+
+export default Login;

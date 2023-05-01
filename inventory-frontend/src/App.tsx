@@ -1,6 +1,5 @@
-import {FC} from "react"
-import Router from "./router"
-
+import {FC} from 'react'
+import Router from './router'
 import './style.scss'
 
 const App:FC = () => {
