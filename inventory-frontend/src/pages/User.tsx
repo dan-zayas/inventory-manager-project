@@ -5,6 +5,7 @@ import { axiosRequest } from '../utils/functions';
 import { UsersUrl } from '../utils/network';
 import { DataProps } from '../utils/types';
 
+// Define the shape of a user
 interface UserProps {
   created_at: string;
   email: string;
@@ -69,6 +70,7 @@ const User: FC = () => {
       showError: false,
     });
 
+    // If the response is successful, update the users state with the retrieved data
     if (response) {
       const data = response.data.results.map((item) => ({
         ...item,
@@ -95,15 +97,23 @@ const User: FC = () => {
   // Render the user list page with the ContentLayout and AddUserForm components
   return (
     <ContentLayout
+      // Set the page title
       pageTitle="User"
+      // Set the modal visibility state
       setModalState={setModalState}
+      // Set the data source for the table
       dataSource={(users as unknown) as DataProps[]}
+      // Set the columns to be rendered in the table
       columns={columns}
+      // Set the fetching state of the component
       fetching={fetching}
     >
       <AddUserForm
+        // Set the callback function to handle successful user creation
         onSuccessCallBack={onCreateUser}
+        // Set the visibility state of the create user modal
         isVisible={modalState}
+        // Set the function to close the modal
         onClose={() => setModalState(false)}
       />
     </ContentLayout>

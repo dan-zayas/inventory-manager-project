@@ -9,6 +9,7 @@ import { UpdatePasswordUrl } from '../utils/network';
 import { notification } from 'antd';
 
 const UpdateUserPassword: FC = () => {
+  // Declare states for loading state and update password user ID
   const [loading, setLoading] = useState(false);
   const {
     state: { updatePasswordUserId },
@@ -44,6 +45,7 @@ const UpdateUserPassword: FC = () => {
 
     setLoading(true);
 
+    // Send a request to update the user password
     const response = await axiosRequest({
       method: 'post',
       url: UpdatePasswordUrl,
@@ -69,12 +71,19 @@ const UpdateUserPassword: FC = () => {
   // Render the AuthComponent with necessary props for updating the user password
   return (
     <AuthComponent
+      // Set the title text for the component
       titleText="Create Password!"
+      // Set the button text for the component
       bottonText="Update"
+      // Set the link text for the component
       linkText="Go Back"
+      // Set the link path for the component
       linkPath="/check-user"
+      // Indicate that this is an update password page
       isUpdatePassword={true}
+      // Set the loading state for the component
       loading={loading}
+      // Set the submit handler function for the component
       onSubmit={onSubmit}
     />
   );

@@ -12,6 +12,7 @@ interface LoginDataProps {
 }
 
 const Login: FC = () => {
+  // Declare state for loading state
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -25,6 +26,7 @@ const Login: FC = () => {
   // Handle the form submission to login the user
   const onSubmit = async (values: DataProps) => {
     setLoading(true);
+    // Send a request to the login endpoint with user credentials
     const response = await axiosRequest<LoginDataProps>({
       method: 'post',
       url: LoginUrl,
@@ -34,7 +36,7 @@ const Login: FC = () => {
       },
     });
 
-    // If login is successful, store the access token and navigate to the homepage
+    // If login is successful, store the access token in local storage and navigate to the homepage
     if (response) {
       localStorage.setItem(tokenName, response.data.access);
       navigate('/');

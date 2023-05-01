@@ -20,39 +20,47 @@ import {
   UserType,
 } from "./types";
 
-// function to get the authorization token from local storage
+// Function to retrieve the authorization token from local storage
 export const getAuthToken = (): AuthTokenType | null => {
+  // Get the access token from local storage
   const accessToken = localStorage.getItem(tokenName);
   if (!accessToken) {
+    // If there is no access token, return null
     return null;
   }
 
+  // Return the authorization token with the access token
   return { Authorization: `Bearer ${accessToken}` };
 };
 
-// function to log the user out by removing the token from local storage and redirecting to the login page
+
+// Function to log the user out by removing the token from local storage and redirecting to the login page
 export const logout = () => {
+  // Remove the token from local storage
   localStorage.removeItem(tokenName);
+  // Redirect the user to the login page
   window.location.href = "/login";
 };
 
-// function to authenticate the user by sending a request to the /me/ endpoint and returning the user object if the request is successful
+// Function to authenticate the user by sending a request to the /me/ endpoint and returning the user object if the request is successful
 export const authHandler = async (): Promise<UserType | null> => {
-
+  // Send a request to the /me/ endpoint to retrieve user information
   const response = await axiosRequest<UserType>({
     url: MeUrl,
     hasAuth: true,
     showError: false,
   });
 
+  // If the response is successful and contains data, return the user object
   if (response) {
     return response.data;
   }
 
+  // If the response is not successful or does not contain data, return null
   return null;
 };
 
-// interface for the props of an axios request
+// Interface for the props of an axios request
 interface AxiosRequestProps {
   method?: "get" | "post" | "patch" | "delete";
   url: string;
@@ -65,7 +73,8 @@ interface AxiosRequestProps {
   };
 }
 
-// function to send an axios request with options for method, url, payload, authorization, and error handling
+
+// Function to send an axios request with options for method, URL, payload, authorization, and error handling
 export const axiosRequest = async <T>({
   method = "get",
   url,
@@ -74,17 +83,19 @@ export const axiosRequest = async <T>({
   errorObject,
   showError = true,
 }: AxiosRequestProps): Promise<AxiosResponse<T> | null> => {
-  // set authorization header based on hasAuth boolean
+  // Set the authorization header based on the hasAuth boolean
   const headers = hasAuth ? getAuthToken() : {};
 
-  // send the request with specified options and handle errors
+  // Send the request with the specified options and handle errors
   const response = await Axios({
     method,
     url,
     data: payload,
     headers: { ...headers },
   }).catch((e: CustomAxiosError) => {
+    // If showError is false, return without showing an error notification
     if (!showError) return;
+    // Show an error notification with the specified message and description
     notification.error({
       message: errorObject
         ? errorObject.message
@@ -95,24 +106,28 @@ export const axiosRequest = async <T>({
     });
   }) as AxiosResponse<T>;
 
+  // If the response is successful, return the response
   if (response) {
     return response;
   }
 
+  // If the response is not successful, return null
   return null;
 };
 
-// function to get the groups and format the data for display
+// Function to get the groups and format the data for display
 export const getGroups = async (
   setGroup: (data: GroupProps[]) => void,
   setFetching: (val: boolean) => void
 ) => {
+  // Send a request to retrieve the groups data
   const response = await axiosRequest<{ results: GroupProps[] }>({
     url: GroupUrl,
     hasAuth: true,
     showError: false,
   });
 
+  // If the response is successful, format the data and set it to the state
   if (response) {
     const data = response.data.results.map((item) => ({
       ...item,
@@ -124,6 +139,7 @@ export const getGroups = async (
     setFetching(false);
   }
 };
+
 
  // This function retrieves inventories from the server.
 // It accepts two parameters, setGroup and setFetching, which are callbacks that are used to update state when the data is retrieved.

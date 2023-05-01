@@ -1,23 +1,24 @@
-import { FC, useState } from 'react'
+import { FC, useState } from 'react';
 import { axiosRequest } from '../utils/functions';
 import { ActivitiesUrl } from '../utils/network';
 import { useEffect } from 'react';
 import ContentLayout from '../components/ContentLayout';
 import { DataProps } from '../utils/types';
 
+// Define the shape of a user activity
 interface UserActivitiesProps {
-  created_at: string
-  name: string
-  created_by: DataProps 
-  created_by_email?: string
-  id: number
+  created_at: string;
+  name: string;
+  created_by: DataProps;
+  created_by_email?: string;
+  id: number;
 }
 
 const UserActivities: FC = () => {
 
   // Initialize states
-  const [fetching, setFetching] = useState(true)
-  const [userActivities, setUserActivities] = useState<UserActivitiesProps[]>([])
+  const [fetching, setFetching] = useState(true);
+  const [userActivities, setUserActivities] = useState<UserActivitiesProps[]>([]);
 
   // Define columns to be rendered in the table
   const columns = [
@@ -38,25 +39,26 @@ const UserActivities: FC = () => {
     },
   ];
 
-  // Function to fetch activities from the backend API
+  // Function to fetch user activities from the backend API
   const getActivities = async () => {
     const response = await axiosRequest<{ results: UserActivitiesProps[] }>({
       url: ActivitiesUrl,
       hasAuth: true,
       showError: false
-    })
+    });
 
+    // If the response is successful, update the userActivities state with the retrieved data
     if (response) {
-      const data = response.data.results
-      setUserActivities(data)
-      setFetching(false)
+      const data = response.data.results;
+      setUserActivities(data);
+      setFetching(false);
     }
   }
 
-  // Fetch activities on mount
+  // Fetch user activities on component mount
   useEffect(() => {
-    getActivities()
-  }, [])
+    getActivities();
+  }, []);
 
   // Render the component
   return (
@@ -72,7 +74,7 @@ const UserActivities: FC = () => {
       // Disable the "Add" button in the layout
       disableAddButton
     />
-  )
+  );
 }
 
-export default UserActivities
+export default UserActivities;
